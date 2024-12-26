@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-d-vb_gcagm!!5u^*v%b2b2bovuqhrk3gny54dee!q(#91(4f(0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '44.201.119.2']
+ALLOWED_HOSTS = ['18.234.132.34']
+
 
 
 
@@ -101,15 +102,10 @@ WSGI_APPLICATION = 'handel.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'handeldb',  # The database you just created
-        'USER': 'postgres',  # PostgreSQL username
-        'PASSWORD': 'Vereine256',  # PostgreSQL password
-        'HOST': 'database-1.c1b1wxczaclk.us-east-1.rds.amazonaws.com',  # Your RDS endpoint
-        'PORT': '5432',  # PostgreSQL default port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 AUTH_USER_MODEL = 'home.UserAuth'
 
 # Password validation
@@ -147,8 +143,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+# URL for static files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Directory to collect static files for production (make sure this directory exists)
+STATIC_ROOT = '/var/www/handel/static/'
+
+# Optionally, configure media files (for user-uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/var/www/handel/media/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
