@@ -1,0 +1,210 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+<!--begin::Container-->
+<div id="kt_content_container" class="container-xxl">
+    <div class="row">
+        <!--begin::Pos order-->
+        <div class="card card-flush bg-body" id="kt_pos_form">
+            <!--begin::Header-->
+            <div class="card-header pt-5">
+                <h3 class="card-title fw-bold text-gray-800 fs-2qx">Current Order</h3>
+				<div id="notifications">
+    <span id="notification-badge">0</span>
+    <ul id="notification-list"></ul>
+</div>
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+                    <a href="#" class="btn btn-light-primary fs-4 fw-bold py-4" onclick="clearCart()">Clear All</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="card-body pt-0">
+                <!--begin::Table container-->
+                <div class="table-responsive mb-8">
+                    <!--begin::Table-->
+                    <table class="table align-middle gs-0 gy-4 my-0">
+                        <!--begin::Table head-->
+                        <thead>
+                            <tr>
+                                <th class="min-w-175px">Product</th>
+                                <th class="w-125px">Quantity</th>
+                                <th class="w-60px">Total</th>
+                            </tr>
+                        </thead>
+                        <!--end::Table head-->
+
+                        <!--begin::Table body-->
+                        <tbody id="cart-items">
+                            <!-- Cart items will be inserted here by JavaScript -->
+                        </tbody>
+                        <!--end::Table body-->
+                    </table>
+                    <!--end::Table-->
+					<div id="order-message" class="fs-11 mt-2"></div>
+                </div>
+                <!--end::Table container-->
+
+                <!--begin::Summary-->
+                <div class="d-flex flex-stack bg-success rounded-3 p-6 mb-11">
+                    <!--begin::Content-->
+                    <div class="fs-6 fw-bold text-white">
+                        <span class="d-block lh-1 mb-2">Subtotal</span>
+                        <span class="d-block mb-2">Discounts</span>
+                        <span class="d-block mb-9">Tax(0%)</span>
+                        <span class="d-block fs-2qx lh-1">Total</span>
+                    </div>
+                    <!--end::Content-->
+
+                    <!--begin::Content-->
+                    <div class="fs-6 fw-bold text-white text-end">
+                        <span class="d-block lh-1 mb-2" id="subtotal">UGX0.00</span>
+                        <span class="d-block mb-2" id="discount">-UGX0.00</span>
+                        <span class="d-block mb-9" id="tax">UGX0.00</span>
+                        <span class="d-block fs-2qx lh-1" id="grand-total">UGX0.00</span>
+                    </div>
+                    <!--end::Content-->
+                </div>
+                <!--end::Summary-->
+
+                <!--begin::Payment Method-->
+                <div class="m-0">
+                    <div class="card card-flush py-4">
+    
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="d-flex flex-column gap-10">
+            
+
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Payment Method</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="payment_method" id="kt_ecommerce_edit_order_payment">
+                    <option></option>
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="visa" >Credit Card (Visa)</option>
+                    <option value="mastercard">Credit Card (Mastercard)</option>
+                    <option value="paypal">Paypal</option>
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set the date of the order to process.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Location</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="shipping_method"  id="kt_ecommerce_edit_order_shipping">
+                    <option></option>
+					{% for location in locations %}
+                    <option value="{{location.id}}">{{location.name}}</option>
+                    {% endfor %}
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set table , room name or number where you are.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+            
+            
+        </div>
+    </div>
+    <!--end::Card header-->
+</div>
+
+                    <!--begin::Actions-->
+                    <button class="btn btn-primary fs-1 w-100 py-3" onclick="checkoutFx()">Check Out</button>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Payment Method-->
+            </div>
+            <!--end: Card Body-->
+        </div>
+        <!--end::Pos order-->
+    </div>
+</div>
+<!--end::Container-->
+<script>
+   // Assuming you have a WebSocket connection already established
+
+// Listen for messages from the WebSocket
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    if (data.type === 'new_order') {
+        // Update the notification counter
+        let notificationCounter = document.getElementById('notification-counter');
+        let count = parseInt(notificationCounter.textContent);
+        notificationCounter.textContent = count + 1;
+
+        // Update the notification list with the new notification
+        let notificationsList = document.getElementById('notifications-list');
+        let newNotification = document.createElement('li');
+        newNotification.classList.add('notification-item');
+        newNotification.classList.add('font-bold'); // New notifications are bold
+        newNotification.textContent = `New order placed: Order #${data.order_id}`;
+        notificationsList.prepend(newNotification);
+    }
+
+    if (data.type === 'notification_viewed') {
+        // Mark the notification as viewed
+        let notificationItem = document.getElementById(`notification-${data.notification_id}`);
+        notificationItem.classList.remove('font-bold'); // Make it not bold anymore
+        notificationItem.classList.add('font-light');
+    }
+};
+
+</script>
+{% endblock %}
+
+{% block Javascript%}
+	 <script>
+
+</script>
+     
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

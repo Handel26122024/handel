@@ -1,0 +1,160 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					 <!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+	<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Layout-->
+<div class="d-flex flex-column flex-lg-row">
+    <!--begin::Sidebar-->
+    <div class="flex-column flex-lg-row-auto w-100 w-lg-200px w-xl-300px mb-10">
+        
+<!--begin::Card-->
+<div class="card card-flush">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <h2 class="mb-0">{{role.role_name}}</h2>
+        </div>
+        <!--end::Card title-->
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <!--begin::Permissions-->
+        <div class="d-flex flex-column text-gray-600">
+			{%for permission in permissions%}
+             <div class="d-flex align-items-center py-2"><span class="bullet bg-primary me-3"></span> {{permission.roles_permission.permission_name}}</div>
+             {%endfor%}               
+            <div>
+			
+			{{role.description}}
+			</div>
+
+        </div>
+        <!--end::Permissions-->
+    </div>
+    <!--end::Card body-->
+
+    <!--begin::Card footer-->
+    <div class="card-footer pt-0">
+        <button type="button" class="btn btn-light btn-active-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_update_role">Edit Role</button>
+    </div>
+    <!--end::Card footer-->
+</div>
+<!--end::Card-->
+
+<!--begin::Modal-->
+
+
+<!--end::Modal - Update role--><!--end::Modal-->    </div>
+    <!--end::Sidebar-->
+
+    <!--begin::Content-->
+<div class="flex-lg-row-fluid ms-lg-10">
+    <!--begin::Card-->
+    <div class="card card-flush mb-6 mb-xl-9">
+        <!--begin::Card header-->
+        <div class="card-header pt-5">
+            <!--begin::Card title-->
+            <div class="card-title">
+                <h2 class="d-flex align-items-center">
+                    Staff Assigned <span class="text-gray-600 fs-6 ms-1">({{ staffs|length }})</span>
+                </h2>
+            </div>
+            <!--end::Card title-->
+
+            <!--begin::Card toolbar-->
+            <div class="card-toolbar">
+                <div class="d-flex align-items-center position-relative my-1">
+                    <button type="submit" class="btn btn-primary p-2" id="kt_account_profile_details_submit">
+                        <a href="{% url 'assignstaff' role.pk %}" class="text-white">Assign New Staff</a>
+                    </button>
+                </div>
+            </div>
+            <!--end::Card toolbar-->
+        </div>
+        <!--end::Card header-->
+
+        <!--begin::Card body-->
+        <div class="card-body pt-0">
+            <!--begin::Wrapper-->
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-xl-5 gy-10">
+                {% for staff in staffs %}
+                <!--begin::Item-->
+                <div class="col text-center mb-9">
+                    <!--begin::Photo-->
+                    <div class="octagon mx-auto mb-2 d-flex w-100px h-100px bgi-no-repeat bgi-size-contain bgi-position-center"
+                        style="background-image: url('{% if staff.assigned_staff.profile_image %}{{ staff.assigned_staff.profile_image.url }}{% else %}{% static 'home/assets/media/svg/avatars/blank-dark.svg' %}{% endif %}')">
+                    </div>
+                    <!--end::Photo-->
+
+                    <!--begin::Person-->
+                    <div class="mb-0">
+                        <!--begin::Name-->
+                        <a href="user-profile/projects.html" class="text-gray-900 fw-bold text-hover-primary fs-12">
+                            {{ staff.assigned_staff.user_name }} 
+                        </a>
+                        <!--end::Name-->
+
+                        <!--begin::Details-->
+                        
+                        <div class="text-muted fs-6 fw-semibold">{{ staff.assigned_staff.phone_number }}</div>
+                        <!--end::Details-->
+                    </div>
+                    <!--end::Person-->
+
+                    <!--begin::Actions-->
+                    <div class="mt-2">
+                        <a href="{% url 'removestaff' staff.pk %}" class="btn btn-sm btn-light btn-active-light-primary">
+                            Remove
+                        </a>
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Item-->
+                {% endfor %}
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Card body-->
+    </div>
+    <!--end::Card-->
+</div>
+<!--end::Content-->
+
+</div>
+<!--end::Layout--></div>
+<!--end::Container--> 
+{% endblock %}
+{% block Javascript%}
+	 
+        <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                         
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                    			
+				
+{% endblock%}
+ 

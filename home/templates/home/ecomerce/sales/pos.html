@@ -1,0 +1,573 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+    <!--begin::Container-->
+    <div id="kt_content_container" class="container-xxl">
+        <!--begin::Layout-->
+        <div class="d-flex flex-column flex-xl-row">
+            <!--begin::Content-->
+            <div class="d-flex flex-row-fluid">
+                <!--begin::Pos food-->
+                <div class="card card-flush card-p-0 bg-transparent border-0">
+                    <div class="card-body">
+                        <ul class="nav nav-pills d-flex justify-content-between nav-pills-custom gap-2 mb-6" id="categoryTab" role="tablist">
+                            <li class="nav-item mb-1 me-0">
+                                <a class="nav-link nav-link-border-solid btn btn-outline btn-flex btn-active-color-primary flex-column flex-stack pt-3 pb-3 page-bg active" 
+                                    id="category-all-tab" 
+                                    data-bs-toggle="pill" 
+                                    href="#category-all" 
+                                    role="tab" 
+                                    aria-controls="category-all" 
+                                    aria-selected="true">
+                                    <div>
+                                        <span class="text-gray-800 fw-bold fs-6 d-block">All</span>
+                                        <span class="text-gray-500 fw-semibold fs-7">{{ categories|length }} Categories</span>
+                                    </div>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+    <li class="nav-item mb-1 me-0">
+        <a class="nav-link nav-link-border-solid btn btn-outline btn-flex btn-active-color-primary flex-column flex-stack pt-1 pb-1 page-bg" 
+            id="category-{{ category.id }}-tab" 
+            data-bs-toggle="pill" 
+            href="#category-{{ category.id }}" 
+            role="tab" 
+            aria-controls="category-{{ category.id }}" 
+            aria-selected="false"
+            style="background: url('{{ category.image.url }}') no-repeat center center; background-size: cover; opacity: 0.8;">
+            <div style="background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px;">
+                <span class=" fw-bold fs-6 d-block">{{ category.name }}</span>
+                <span class=" fw-semibold fs-7">{{ category.products.count }} Options</span>
+            </div>
+        </a>
+    </li>
+{% endfor %}
+
+                        </ul>
+
+                        <div class="tab-content" id="categoryTabContent">
+                            <div class="tab-pane fade show active" id="category-all" role="tabpanel" aria-labelledby="category-all-tab">
+                                <div class="row g-2">
+                                    {% for category in categories %}
+                                        {% for product in category.products.all %}
+                                        <div class="col-6 col-md-4 col-lg-3">
+                                            <div class="card product-card" style="border-radius: 8px; overflow: hidden;">
+                                                <img src="{{ product.product_image.url }}" style="border-radius: 5px; "alt="Product Image" class="card-img-top">
+                                                <div class="card-body p-1">
+                                                    <h5 class="fs-9">{{ product.product_name }}</h5>
+                                                    <h5 class="text-danger fs-11">UGX {{ product.price }}</h5>
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        <button class="btn btn-warning shadow-sm mb-2 p-1 fs-11 rounded" onclick="addToPosCart({{ product.id }}, '{{ product.product_name }}', {{ product.price }}, '{{ product.product_image.url }}')">
+                                                            <i class="fas fa-cart-plus"></i> Add to Cart
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% for category in categories %}
+                            <div class="tab-pane fade" id="category-{{ category.id }}" role="tabpanel" aria-labelledby="category-{{ category.id }}-tab">
+                                <div class="row g-2">
+                                    {% for product in category.products.all %}
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="card product-card" style="border-radius: 8px; overflow: hidden;">
+                                            <img src="{{ product.product_image.url }}" style="border-radius: 5px;"alt="Product Image" class="card-img-top">
+                                            <div class="card-body p-1">
+                                                <h5 class="fs-9">{{ product.product_name }}</h5>
+                                                <h5 class="text-danger fs-11">UGX {{ product.price }}</h5>
+                                                <div class="d-flex justify-content-center align-items-center">
+                                                    <button class="btn btn-warning shadow-sm mb-2 p-1 fs-11 rounded" onclick="addToPosCart({{ product.id }}, '{{ product.product_name }}', {{ product.price }}, '{{ product.product_image.url }}')">
+                                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!--end::Pos food-->
+            </div>
+            <!--end::Content--> 
+            
+            <!--begin::Sidebar-->
+         <!--begin::Sidebar-->
+<div class="flex-row-auto w-xl-450px">
+    <div class="card card-flush bg-body" id="kt_pos_form">
+        <div class="card-header pt-5">
+            <h3 class="card-title fw-bold text-gray-800 fs-2qx">Current Order</h3>
+            <div class="card-toolbar">
+                <button class="btn btn-light-primary fs-4 fw-bold py-4" onclick="localStorage.removeItem('posCart'); displayPosCartItems();">Clear All</button>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="table-responsive mb-8">
+                <table class="table align-middle gs-0 gy-4 my-0">
+                    <thead>
+                        <tr>
+                            <th class="min-w-175px">Item</th>
+                            <th class="w-125px">Quantity</th>
+                            <th class="w-60px">Total</th>
+                            <th class="w-60px">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="posCartTableBody">
+                        <!-- Cart items will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+				
+            </div>
+
+            <!-- Location Field -->
+           <!--begin::Input group-->
+<div class="fv-row">
+    <!--begin::Label-->
+    <label class="required form-label">Location</label>
+    <!--end::Label-->
+
+    <!--begin::Select2-->
+    <select class="form-select mb-2" data-control="select2" data-placeholder="Select an option" name="location" id="location">
+        <option></option>
+        {% for location in locations %}
+        <option value="{{ location.id }}" data-price="{{ location.price }}">
+            {{ location.name }} ({{ active_business.businesses.currency }}: {{ location.price }})
+        </option>
+        {% endfor %}
+    </select>
+    <!--end::Select2-->
+
+    <!--begin::Description-->
+    <div class="text-muted fs-7">Set table, room name or number where you are.</div>
+    <!--end::Description-->
+</div>
+<!--end::Input group-->
+
+			
+			
+			
+			<!--begin::Input group-->
+            <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-form-label required fw-semibold fs-6">Amount Paid</label>
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="fv-row">
+                    <input type="text" id="amount_paid" name="amount_paid" class="form-control form-control-lg form-control-solid" placeholder="Amount Paid" />
+                    <div class="text-danger mt-2">
+                        {% for error in form.amount_paid.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+<!-- Summary -->
+            <div class="d-flex flex-stack bg-success rounded-3 p-6 mb-11">
+                <!--begin::Content-->
+                <div class="fs-6 fw-bold text-white">
+                    <span class="d-block lh-1 mb-2">Subtotal</span>
+					<span class="d-block mb-2">Shipping Fee</span>
+                    <span class="d-block mb-2">Discounts</span>
+                    <span class="d-block mb-9">Tax(0%)</span>
+                    <span class="d-block fs-2qx lh-1">Total</span>
+                    
+                    <span class="d-block lh-1 mb-2">Amount Paid</span>
+                    <span class="d-block lh-1 mb-2">Change</span>
+                    <span class="d-block lh-1 mb-2">Balance</span>
+                </div>
+                <!--end::Content-->
+
+                <!--begin::Content-->
+                <div class="fs-6 fw-bold text-white text-end">
+                    <span class="d-block lh-1 mb-2" id="subtotal">UGX0.00</span>
+					  <span class="d-block mb-2" id="shippingcost">-UGX0.00</span>
+                    <span class="d-block mb-2" id="discount">-UGX0.00</span>
+                    <span class="d-block mb-9" id="tax">UGX0.00</span>
+                    <span class="d-block fs-2qx lh-1" id="grand-total">UGX0.00</span>
+                    <span class="d-block lh-1 mb-2" id="amount-paid">UGX0.00</span>
+                    <span class="d-block lh-1 mb-2" id="change">UGX0.00</span>
+                    <span class="d-block lh-1 mb-2" id="balance">UGX0.00</span>
+                </div>
+                <!--end::Content-->
+            </div>
+            <!--end::Summary-->
+
+
+
+            <!-- Payment Method -->
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Payment Method</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="payment_method" id="payment_method">
+                    <option ></option>
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="visa">Credit Card (Visa)</option>
+                    <option value="mastercard">Credit Card (Mastercard)</option>
+                    <option value="paypal">Paypal</option>
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set the payment method for the order.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+
+            <!-- Order Note -->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-form-label fw-semibold fs-6">
+                    <span class="required">Order Note</span>
+                </label>
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="fv-row">
+                    <textarea id="order_note" name="order_note" class="form-control form-control-lg form-control-solid" rows="4" placeholder="Order note"></textarea>
+                    <div class="text-danger mt-2">
+                        {% for error in form.order_note.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+                <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!-- Amount Paid -->
+            
+
+            <!-- Order Status -->
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Order Status</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="order_status" id="order_status">
+                    <option></option>
+                    {% for orderstatus in orderstatuses %}
+                    <option value="{{ orderstatus.pk }}" {% if orderstatus.pk == order.status_id %}selected{% endif %}>
+                        {{ orderstatus.status_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set the status of the order.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+
+            <!-- Assign Delivery Staff -->
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Assign Staff</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="delivery_staff" id="staff">
+                    <option></option>
+                    {% for staff in staffs %}
+                    <option value="{{ staff.pk }}" {% if staff.pk == order.delivered_by_id %}selected{% endif %}>
+                        {{ staff.assigned_staff.user_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Choose staff to process or deliver the order.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+
+            
+			<div id="order-message" class="fs-11 mt-2"></div>
+            <div class="m-0">
+			
+                <button class="btn btn-primary fs-1 w-100 py-4" onclick="posCheckout()">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Sidebar-->
+
+
+
+<!--end::Sidebar-->
+
+            <!--end::Sidebar--> 
+        </div>
+        <!--end::Layout--> 
+    </div>
+    <!--end::Container-->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Select2
+    $('#location').select2({
+        placeholder: "Select an option",
+        allowClear: true
+    });
+
+    // Listen for the 'select2:select' event on the location dropdown using jQuery
+    $('#location').on('select2:select', function () {
+        
+        updateBalance(); // Update the cart summary when a new location is selected
+    });
+});
+
+
+
+// Function to add an item to the POS cart
+function addToPosCart(id, name, price, image) {
+    let posCart = JSON.parse(localStorage.getItem('posCart')) || [];
+
+    // Check if item already exists in cart
+    let itemIndex = posCart.findIndex(item => item.product_id === id);
+    if (itemIndex > -1) {
+        posCart[itemIndex].quantity += 1; // Increase quantity if already in cart
+    } else {
+        posCart.push({
+            product_id: id,
+            product_name: name,
+            price: price,
+            quantity: 1,
+            image: image
+        });
+    }
+
+    localStorage.setItem('posCart', JSON.stringify(posCart));
+    displayPosCartItems();
+}
+
+
+// Function to remove an item from the POS cart
+function removeFromPosCart(id) {
+    let posCart = JSON.parse(localStorage.getItem('posCart')) || [];
+    posCart = posCart.filter(item => item.product_id !== id);
+    localStorage.setItem('posCart', JSON.stringify(posCart));
+    displayPosCartItems();
+}
+
+// Function to update the balance, change, and grand total with location fees
+function updateBalance() {
+    let subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('UGX', '').replace(',', '').trim()) || 0;
+    let locationSelect = document.getElementById('location');
+    let locationFee = 0;
+
+    // Get the location fee if a location is selected
+    if (locationSelect) {
+        let selectedOption = locationSelect.options[locationSelect.selectedIndex];
+        if (selectedOption) {
+            locationFee = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+        }
+    }
+
+    let total = subtotal + locationFee;
+    let amountPaid = parseFloat(document.getElementById('amount_paid').value) || 0;
+    let balance = total - amountPaid;
+    let change = amountPaid - total;
+
+    // Ensure balance and change are non-negative
+    if (balance < 0) balance = 0;
+    if (change < 0) change = 0;
+
+    // Update summary fields
+    document.getElementById('grand-total').textContent = `UGX ${total.toFixed(2)}`;
+    document.getElementById('amount-paid').textContent = `UGX ${amountPaid.toFixed(2)}`;
+    document.getElementById('balance').textContent = `UGX ${balance.toFixed(2)}`;
+    document.getElementById('change').textContent = `UGX ${change.toFixed(2)}`;
+	 document.getElementById('shippingcost').textContent = `UGX ${locationFee.toFixed(2)}`;
+}
+
+
+
+
+// Add event listener to amount paid input field
+document.getElementById('amount_paid').addEventListener('input', updateBalance);
+
+function posCheckout() {
+    const location = document.getElementById('location').value;
+    const paymentMethod = document.getElementById('payment_method').value;
+    const orderNote = document.getElementById('order_note').value;
+    const status = document.getElementById('order_status').value;
+    const staff = document.getElementById('staff').value;
+    const amountPaid = parseFloat(document.getElementById('amount_paid').value) || 0;
+
+    const cartItems = JSON.parse(localStorage.getItem('posCart')) || [];
+    const total = parseFloat(document.getElementById('grand-total').textContent.replace('UGX', '').replace(',', '').trim()) || 0;
+    const balance = parseFloat(document.getElementById('balance').textContent.replace('UGX', '').replace(',', '').trim()) || 0;
+    const change = parseFloat(document.getElementById('change').textContent.replace('UGX', '').replace(',', '').trim()) || 0;
+	
+    // Clear any existing messages in the order-message div
+    const orderMessageDiv = document.getElementById('order-message');
+    orderMessageDiv.innerHTML = ''; // Clear previous messages
+
+    fetch("{% url 'poscheckout' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') // Assuming you have a function to get the CSRF token
+        },
+        body: JSON.stringify({
+            location: location,
+            payment_method: paymentMethod,
+            
+            order_note: orderNote,
+            amount_paid: amountPaid,
+            total: total,
+            status: status,
+            staff: staff,
+            balance: balance,
+            change: change,
+            cart_items: cartItems
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            // Display error messages
+            const errorElement = document.createElement('p');
+            errorElement.classList.add('alert', 'alert-danger', 'text-center', 'fs-11');
+            errorElement.textContent = data.error;
+            orderMessageDiv.appendChild(errorElement);
+        } else {
+            // Success message
+            // Success message
+			const successElement = document.createElement('p');
+			successElement.style.color = 'green';
+			successElement.classList.add('alert', 'alert-success', 'text-center', 'fs-11');
+			successElement.textContent = 'Order placed successfully.';
+			orderMessageDiv.appendChild(successElement);
+
+			// Clear cart and refresh UI
+			localStorage.removeItem('posCart');
+			displayPosCartItems();
+
+			
+			document.getElementById('order_note').value = '';  // Clear order note
+			
+			document.getElementById('amount_paid').value = '';  // Clear amount paid
+			
+			
+			// Reset Select2 to the first option
+			$('#location').val('').trigger('change');  // Reset location select to placeholder
+			$('#payment_method').val('').trigger('change');  // Reset payment method select
+			$('#order_status').val('').trigger('change');  // Reset order status select
+			$('#staff').val('').trigger('change');  // Reset staff select
+			updateBalance()
+
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const errorElement = document.createElement('p');
+        errorElement.classList.add('alert', 'alert-danger', 'text-center', 'fs-11');
+        errorElement.textContent = 'An unexpected error occurred. Please try again.';
+        orderMessageDiv.appendChild(errorElement);
+    });
+}
+
+// Function to display POS cart items in the sidebar
+function displayPosCartItems() {
+    let posCart = JSON.parse(localStorage.getItem('posCart')) || [];
+    let posCartTableBody = document.getElementById('posCartTableBody');
+    posCartTableBody.innerHTML = '';
+    let total = 0;
+
+    posCart.forEach(item => {
+        total += item.price * item.quantity;
+        posCartTableBody.innerHTML += `
+            <tr>
+                <td>${item.product_name}</td>
+                <td>
+                    <button class="btn btn-sm btn-light" onclick="changePosQuantity(${item.product_id}, -1)">-</button>
+                    ${item.quantity}
+                    <button class="btn btn-sm btn-light" onclick="changePosQuantity(${item.product_id}, 1)">+</button>
+                </td>
+                <td>UGX ${item.price * item.quantity}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="removeFromPosCart(${item.product_id})">X</button></td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('subtotal').textContent = `UGX ${total.toFixed(2)}`;
+    document.getElementById('grand-total').textContent = `UGX ${total.toFixed(2)}`;
+    updateBalance();
+}
+
+// Function to change POS cart item quantity
+function changePosQuantity(id, change) {
+    let posCart = JSON.parse(localStorage.getItem('posCart')) || [];
+    let itemIndex = posCart.findIndex(item => item.product_id === id);
+    if (itemIndex > -1) {
+        posCart[itemIndex].quantity += change;
+        if (posCart[itemIndex].quantity < 1) {
+            posCart[itemIndex].quantity = 1; // Ensure quantity doesn't go below 1
+        }
+        localStorage.setItem('posCart', JSON.stringify(posCart));
+        displayPosCartItems();
+    }
+}
+
+// Initial display of POS cart items
+displayPosCartItems();
+
+</script>
+
+
+
+{% endblock %}
+
+
+{% block Javascript%}
+	 
+        
+                   
+        
+                   <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+				
+{% endblock%}
+ 

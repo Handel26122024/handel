@@ -1,0 +1,132 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <div class="row">
+	<!--begin::Col--> 
+        <div class="col-md-4">   
+	 <!--begin::Feeds Widget 2-->
+<div class="card mb-5 mb-xxl-8">
+    <!--begin::Body-->
+    <div class="card-body pb-0">
+        <!--begin::Header-->
+        <div class="d-flex align-items-center mb-5">
+            <!--begin::User-->
+            <div class="d-flex align-items-center flex-grow-1">
+                <!--begin::Avatar-->
+                <div class="symbol symbol-45px me-5">
+                    <img src="{{active_business.businesses.profile_image.url}}" alt=""/>     
+                </div>
+                <!--end::Avatar-->
+
+                <!--begin::Info-->
+                <div class="d-flex flex-column">
+                    <a href="#" class="text-gray-900 text-hover-primary fs-6 fw-bold">Nick Logan</a>
+
+                    <span class="text-gray-500 fw-bold">2 mins ago</span>
+                </div>
+                <!--end::Info-->
+            </div>		 
+            <!--end::User-->             
+
+            
+        </div>
+        <!--end::Header-->
+
+        <!--begin::Post-->
+        <div class="mb-5">
+            <!--begin::Text-->
+            <p class="text-gray-800 fw-normal mb-5">
+                Outlines keep you honest. They stop you from indulging in
+                poorly thought-out metaphors about driving and keep you
+                focused on the overall structure of your post
+            </p>
+            <!--end::Text-->
+
+            <!--begin::Toolbar-->
+            <div class="d-flex align-items-center mb-5">    
+                <a href="#" class="btn btn-sm btn-success btn-color-white btn-active-light-success px-4 py-2 me-4">
+                    <i class="ki-outline ki-message-text-2 fs-2"></i>                    Accept
+                </a>
+
+                <a href="#" class="btn btn-sm btn-danger btn-color-white btn-active-light-danger px-4 py-2">
+                    <i class="ki-outline ki-heart fs-2"></i>                    Decline
+                </a>
+            </div>
+            <!--end::Toolbar-->
+        </div>
+        <!--end::Post-->
+
+        <!--begin::Separator-->
+        <div class="separator mb-4"></div>
+        <!--end::Separator-->
+
+        
+    </div>
+    <!--end::Body-->
+</div>
+<!--end::Feeds Widget 2-->
+
+
+
+    </div>
+</div>
+</div>
+<!--end::Container-->
+<script>
+function storeEscortId(escortId) {
+    $.ajax({
+        url: '{% url "store_escort_id" %}', // Make sure this URL matches the URL pattern for your view
+        type: 'POST',
+        data: {
+            'escort_id': escortId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Redirect to the page after successfully setting the session
+            window.location.href = '{% url "ourescort" %}'; // Replace with the actual URL to fetch the escort
+        },
+        error: function(xhr, status, error) {
+            console.error("Error: ", error);
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

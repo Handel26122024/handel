@@ -1,0 +1,655 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load humanize %}
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+		<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Order details page-->
+<div class="d-flex flex-column gap-7 gap-lg-10">
+    <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10">
+    <!--begin:::Tabs-->
+    <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto">
+        <!--begin:::Tab item-->
+        <li class="nav-item">
+            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_sales_order_summary">Order Summary</a>
+        </li>
+        <!--end:::Tab item-->
+
+        <!--begin:::Tab item-->
+        <li class="nav-item">
+            <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_sales_order_history">Order History</a>
+        </li>
+        <!--end:::Tab item-->
+    </ul>
+    <!--end:::Tabs-->
+
+    <!--begin::Button-->
+    <a href="listing.html" class="btn btn-icon btn-light btn-active-secondary btn-sm ms-auto me-lg-n7">
+        <i class="ki-outline ki-left fs-2"></i>    </a>
+    <!--end::Button-->
+    
+    <!--begin::Button-->
+    <a href="{% url 'cart'  %}"  class="btn btn-success btn-sm me-lg-n7">Edit Order</a>
+    <!--end::Button-->
+
+    <!--begin::Button-->
+    <a href="{% url 'shop'  %}"  class="btn btn-primary btn-sm">Add New Order</a>
+    <!--end::Button-->
+</div>
+    <!--begin::Order summary-->
+    <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">
+        <!--begin::Order details-->
+<div class="card card-flush py-4 flex-row-fluid">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <div class="card-title">
+             <h2>Order Details (#{{ order.id }})</h2>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="table">
+            <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5 min-w-300px">
+                            <tbody class="fw-semibold text-gray-600">
+                                <tr>
+                                    <td class="text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-calendar fs-2 me-2"></i>Date Added
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-start">{{ order.created_at|timesince }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-wallet fs-2 me-2"></i>Payment Method
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-start">{{ order.get_payment_method_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-location fs-2 me-2"></i>Location
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-start">{{ order.order_location }}({{order.order_location.description}})</td>
+                                </tr>
+                            </tbody>
+                        </table>
+        </div>
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Order details-->
+        
+<!--begin::Customer details-->
+<div class="card card-flush py-4  flex-row-fluid">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <div class="card-title">
+            <h2>Customer Details</h2>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="table-responsive">
+            <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5 min-w-300px">
+                            <tbody class="fw-semibold text-gray-600">
+                                <tr>
+                                    <td class="text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-user fs-2 me-2"></i>Customer
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-start">
+                                        <a href="../customers/details.html" class="text-gray-600 text-hover-primary">{{ order.customer.user_name }}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-phone fs-2 me-2"></i>Phone
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-start">{{ order.customer.phone_number }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+						
+        </div>
+		<h4>Order Note</h4>
+		{% if order.order_note%}
+						 <p class="fw-bold alert alert-primary  fs-11">
+        {{order.note}}
+    <p>
+	{%else %}
+	 <p class="fw-bold alert alert-primary  fs-11">
+        Empty Note
+    <p>
+	{%endif%}
+    </div>
+	
+    <!--end::Card body-->
+</div>
+<!--end::Customer details-->
+        <!--begin::Documents-->
+<div class="card card-flush py-4  flex-row-fluid">
+   
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+   
+	 <h2 class="pt-1">Order Status</h2>
+	 
+	<input type="hidden" name="order_id" id="order_id" value="{{ order.id }}">
+
+<!--begin::Input group-->
+<div class="fv-row">
+    <!--begin::Label-->
+    <label class="required form-label">Change Order Status</label>
+    <!--end::Label-->
+
+    <!--begin::Select2-->
+    <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="status" id="status">
+        <option></option>
+        {% for orderstatus in orderstatuses %}
+            <option value="{{ orderstatus.pk }}" {% if orderstatus.pk == order.status_id %}selected{% endif %}>
+                {{ orderstatus.status_name }}
+            </option>
+        {% endfor %}
+    </select>
+    <!--end::Select2-->
+
+    <!--begin::Description-->
+    <div class="text-muted fs-7">Set the date of the order to process.</div>
+    <!--end::Description-->
+</div>
+<!--end::Input group-->
+
+<!--begin::Input group-->
+<div class="fv-row">
+    <!--begin::Label-->
+    <label class="required form-label">Assign Delivery Staff</label>
+    <!--end::Label-->
+
+    <!--begin::Select2-->
+    <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="staff" id="staff">
+        <option></option>
+        {% for staff in staffs %}
+            <option value="{{ staff.pk }}" {% if staff.pk == order.delivered_by_id %}selected{% endif %}>
+                {{ staff.assigned_staff.user_name }}
+            </option>
+        {% endfor %}
+    </select>
+    <!--end::Select2-->
+
+    <!--begin::Description-->
+    <div class="text-muted fs-7">Choose staff to process or deliver the order.</div>
+    <!--end::Description-->
+</div>
+<!--end::Input group-->
+<div id="order-message"></div>
+<button class="btn btn-primary fs-1 w-100 py-1" onclick="SatusAndstaff()">Save Status</button>
+
+
+
+    <!--end::Card body-->
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Documents-->    </div>
+    <!--end::Order summary-->
+
+    <!--begin::Tab content-->
+    <div class="tab-content">
+        <!--begin::Tab pane-->
+        <div class="tab-pane fade show active" id="kt_ecommerce_sales_order_summary" role="tab-panel">
+            <!--begin::Orders-->
+            <div class="d-flex flex-column gap-7 gap-lg-10">
+                
+
+                <!--begin::Product List-->
+<div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <div class="card-title">
+                <h2>Order #{{ order.id }}</h2>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+       
+	   <div class="table-responsive">
+               <table class="table table-striped  align-middle table-row-dashed fs-6 gy-5 mb-0">
+                <thead>
+                    <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                        <th class="min-w-175px">Product</th>
+                        <th class="">SKU</th>
+                        <th class="min-w-70px">Qty</th>
+                        <th class="min-w-100px ">Unit Price</th>
+                        <th class="min-w-100px">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="fw-semibold text-gray-600">
+                    {% for item in order_items %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <a href="../catalog/edit-product.html" class="symbol symbol-50px">
+                                    <span class="symbol-label" style="background-image:url({{ item.image }});"></span>
+                                </a>
+                                <div class="ms-5">
+                                    <a href="../catalog/edit-product.html" class="fw-bold text-gray-600 text-hover-primary">{{ item.product_name }}</a>
+                                    <div class="fs-7 text-muted">Delivery Date: {{ order.created_at }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="">{{ item.product_id }}</td>
+                        <td class="">{{ item.quantity }}</td>
+                        <td class="">{{active_business.businesses.currency }}:{{ item.price }}</td>
+                        <td class="">{{active_business.businesses.currency }}:{{ item.total_price }}</td>
+                    </tr>
+                    {% endfor %}
+					<tr>
+                        <td  class="text-start">Shipping Fee</td>
+                        <td colspan="4" class="text-start">{{active_business.businesses.currency }}:{{ order.order_location.price }}</td>
+                    </tr>
+                    <tr>
+                        <td  class="text-start">Subtotal</td>
+                        <td colspan="4" class="text-start">{{active_business.businesses.currency }}:{{ order.total_price }}</td>
+                    </tr>
+                   
+                   
+					<tr>
+                        
+                        <td colspan="5" class="text-dark fw-boldest text-start">Payement History</td>
+                    </tr>
+					 <!-- Example Payment Proofs -->
+				{% for proof in payement_proof %}
+                <tr>
+                    <td>
+					<div class="d-flex align-items-center">
+					
+					{% if proof.screenshoot %} 
+                                <a href="{% url 'editpayement_proof'  proof.id  %}" class="symbol symbol-50px">
+                                    <span class="symbol-label"  style="background-image:url({{ proof.screenshoot.url }});"></span>
+                                </a> {% endif %}
+                                <div class="ms-5">
+                                   {% if proof.transaction_id %}
+								   <a href="{% url 'editpayement_proof'  proof.id  %}"class="fw-bold text-gray-600 text-hover-primary">Transaction ID: {{ proof.transaction_id }}</a>
+                                    {% endif%}
+									<div class="fs-7 text-muted">Date Added: {{proof.created_at}}</div>
+									<div class="fs-7 text-muted">Mode: {{proof.payment_method}}</div>
+                                </div>
+                            </div>
+					
+					
+					</td>
+                    <td class="text-success">{{ proof.amount_paid }}</td>
+                    {% if proof.confirmed == True %}
+                    <td><span class="text-info"> Confirmed</span></td>
+					{% else %}
+					<td><span class="text-warning"> Pending</span></td>
+					{% endif %}
+					<td>
+					<p class="text-primary">Balance {{active_business.businesses.currency }}</p>
+					<p class="text-warning">Change {{active_business.businesses.currency }}</p>
+					</td>
+                    
+                    <td>
+					<p class="text-danger">{{ proof.balance }}</p>
+					<p class="text-warning">{{ proof.change }}</p>
+					</td>
+                
+				
+				
+				
+				<td class="text-end">
+							<!--begin::Dropdown-->
+							<div class="dropdown">
+								<a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-bs-toggle="dropdown" aria-expanded="false">
+									Actions
+								</a>
+								<div class="dropdown-menu dropdown-menu-end">
+									<div class="menu-item px-3 ">
+										<a href="{% url 'confirmpayement' proof.pk %}" class="dropdown-item  btn btn-sm btn-light btn-active-primary">
+											Confirm
+										</a>
+									</div>
+									<div class="menu-item px-3 ">
+										<a href="{% url 'rejectpayement' proof.pk %}" class="dropdown-item  btn btn-sm btn-light btn-active-danger">
+											Reject
+										</a>
+									</div>
+									
+								</div>
+							</div>
+							<!--end::Dropdown-->
+						</td>
+				</tr>
+                
+				{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+	</div>
+    <!--end::Card body-->
+	
+</div>
+<!--end::Product List-->            </div>
+            <!--end::Orders-->
+        </div>
+        <!--end::Tab pane-->
+
+        <!--begin::Tab pane-->
+        <div class="tab-pane fade" id="kt_ecommerce_sales_order_history" role="tab-panel">
+            <!--begin::Orders-->
+            <div class="d-flex flex-column gap-7 gap-lg-10">
+                <!--begin::Order history-->
+<div class="card card-flush py-4 flex-row-fluid">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <div class="card-title">
+            <h2>Order History</h2>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="table-responsive">
+            <!--begin::Table-->
+            <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                <thead>
+                    <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                        <th class="min-w-100px">Date Added</th>
+                        <th class="min-w-175px">Comment</th>
+                        <th class="min-w-70px">Order Status</th>
+                        <th class="min-w-100px">Customer Notifed</th>
+                    </tr>
+                </thead>
+                <tbody class="fw-semibold text-gray-600">
+                                            <tr>
+                            <td>22/06/2024</td>
+                            <td>
+                                Order completed                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-success">Completed</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                No                            </td>
+                        </tr>
+                                            <tr>
+                            <td>21/06/2024</td>
+                            <td>
+                                Order received by customer                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-success">Delivered</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                Yes                            </td>
+                        </tr>
+                                            <tr>
+                            <td>20/06/2024</td>
+                            <td>
+                                Order shipped from warehouse                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-primary">Delivering</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                Yes                            </td>
+                        </tr>
+                                            <tr>
+                            <td>19/06/2024</td>
+                            <td>
+                                Payment received                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-primary">Processing</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                No                            </td>
+                        </tr>
+                                            <tr>
+                            <td>18/06/2024</td>
+                            <td>
+                                Pending payment                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-warning">Pending</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                No                            </td>
+                        </tr>
+                                            <tr>
+                            <td>17/06/2024</td>
+                            <td>
+                                Payment method updated                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-warning">Pending</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                No                            </td>
+                        </tr>
+                                            <tr>
+                            <td>16/06/2024</td>
+                            <td>
+                                Payment method expired                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-danger">Failed</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                Yes                            </td>
+                        </tr>
+                                            <tr>
+                            <td>15/06/2024</td>
+                            <td>
+                                Pending payment                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-warning">Pending</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                No                            </td>
+                        </tr>
+                                            <tr>
+                            <td>14/06/2024</td>
+                            <td>
+                                Order received                            </td>
+                            <td>
+                                <!--begin::Badges-->
+                                <div class="badge badge-light-warning">Pending</div>
+                                <!--end::Badges-->
+                            </td>
+                            <td>
+                                Yes                            </td>
+                        </tr>
+                                    </tbody>
+            </table>
+            <!--end::Table-->
+        </div>
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Order history-->
+                <!--begin::Order data-->
+<div class="card card-flush py-4 flex-row-fluid">
+    <!--begin::Card header-->
+    <div class="card-header">
+        <div class="card-title">
+            <h2>Order Data</h2>
+        </div>
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="table-responsive">
+            <!--begin::Table-->
+            <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5">
+                <tbody class="fw-semibold text-gray-600">
+                    <tr>
+                        <td class="text-muted">IP Address</td>
+                        <td class="fw-bold text-end">172.68.221.26</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Forwarded IP</td>
+                        <td class="fw-bold text-end">89.201.163.49</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">User Agent</td>
+                        <td class="fw-bold text-end">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Accept Language</td>
+                        <td class="fw-bold text-end">en-GB,en-US;q=0.9,en;q=0.8</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--end::Table-->
+        </div>
+    </div>
+    <!--end::Card body-->
+</div>
+<!--end::Order data-->            </div>
+            <!--end::Orders-->
+        </div>
+        <!--end::Tab pane-->
+    </div>
+    <!--end::Tab content-->
+</div>
+<!--end::Order details page--></div>
+<!--end::Container-->
+<script>
+function showMessage(container, message, type) {
+    // Clear existing messages
+    container.innerHTML = '';
+
+    // Create a new message element
+    const messageElement = document.createElement('div');
+
+    // Set the appropriate class based on the type
+    if (type === 'success') {
+        messageElement.className = 'fw-bold alert alert-success fs-11'; // Success message styling
+    } else if (type === 'error') {
+        messageElement.className = 'fw-bold alert alert-danger fs-11'; // Error message styling
+    }
+
+    // Set the message text
+    messageElement.textContent = message;
+
+    // Append the message to the container
+    container.appendChild(messageElement);
+}
+
+ function SatusAndstaff() {
+    const OrderIDField = document.getElementById('order_id');
+    const statusField = document.getElementById('status');
+    const staffField = document.getElementById('staff');
+    const status = statusField.value;
+    const staff = staffField.value;
+    const order_id = OrderIDField.value;
+
+    // Clear previous error messages
+    clearErrorMessages();
+
+    let hasError = false;
+
+    // Validation for required fields
+    if (!status) {
+        displayError(statusField, 'Please select a status.');
+        hasError = true;
+    }
+    if (!staff) {
+        displayError(staffField, 'Please select a staff member.');
+        hasError = true;
+    }
+
+    if (hasError) {
+        return;
+    }
+
+    fetch("{% url 'statusandstaff' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ staff, status, order_id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageContainer = document.getElementById('order-message');
+
+        if (messageContainer) {
+            if (data.success) {
+                showMessage(messageContainer, 'Order updated successfully!', 'success');
+            } else {
+                showMessage(messageContainer, 'Failed to update order.', 'error');
+            }
+        } else {
+            console.error('Message container not found.');
+        }
+    });
+}
+
+
+</script>                	   
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

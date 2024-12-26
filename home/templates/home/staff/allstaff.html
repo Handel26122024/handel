@@ -1,0 +1,144 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					 <!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+					
+	
+				{% endblock%}
+{% block content%}
+<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Card-->
+<div class="card">
+    <!--begin::Card header-->
+    <div class="card-header border-0 pt-6">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-outline ki-magnifier fs-3 position-absolute ms-5"></i>                <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search user" />
+            </div>
+            <!--end::Search-->
+        </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+<div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+    <div class="me-3">
+                <!--begin::Select2-->
+                <select id="roleFilter" class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-placeholder="Select Role">
+					<option value="all">All Roles</option>
+					{% for role in roles %}
+						<option value="{{ role.role }}">{{ role.role_name }}</option>
+					{% endfor %}
+				</select>
+
+                <!--end::Select2-->
+            </div>
+
+    
+
+    <!--begin::Add user-->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_user">
+        <i class="ki-outline ki-plus fs-2"></i>        Add New Staff
+    </button>
+    <!--end::Add user-->
+</div>
+<!--end::Toolbar-->
+
+
+
+
+
+      </div>
+        <!--end::Card toolbar-->
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body py-4">
+	
+        
+<!--begin::Wrapper-->
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-xl-5 gy-10">
+	
+			{% for staff in staffs %}
+		<div class="col text-center mb-9 staff-item" data-role="{{ staff.staff_role }}">
+			<!-- Staff Details -->
+			<div class="octagon mx-auto mb-2 d-flex w-150px h-150px bgi-no-repeat bgi-size-contain bgi-position-center" 
+				 style="background-image: url('{% if staff.assigned_staff.profile_image %}{{staff.assigned_staff.profile_image.url}}{% else %}{% static 'home/assets/media/svg/avatars/blank-dark.svg' %}{% endif %}')">
+			</div>
+			<div class="mb-0">
+				<a href="#" class="text-gray-900 fw-bold text-hover-primary fs-12">
+					{{ staff.assigned_staff.user_name }}
+				</a>
+				<div class="text-muted fs-6 fw-semibold">{{ staff.staff_role }}</div>
+				<div class="text-muted fs-6 fw-semibold">{{ staff.assigned_staff.phone_number }}</div>
+			</div>
+		</div>
+		{% endfor %}
+
+    
+
+              
+             
+    </div>
+    <!--end::Wrapper--> 
+
+
+
+	</div>
+    <!--end::Card body-->
+</div>
+<!--end::Card--></div>
+<!--end::Container-->  
+     <script>
+	document.getElementById('roleFilter').addEventListener('change', function() {
+    const selectedRole = this.value;
+    const staffItems = document.querySelectorAll('.staff-item');
+
+    staffItems.forEach(item => {
+        const staffRole = item.getAttribute('data-role');
+        if (selectedRole === 'all' || staffRole === selectedRole) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+ 
+	 
+	 
+	 </script>
+{% endblock %}
+{% block Javascript%}
+	 
+								
+								
+								
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                         
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+				
+{% endblock%}
+ 

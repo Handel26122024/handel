@@ -1,0 +1,239 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+		<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+
+
+  <!--begin::Products-->
+<div class="card card-flush">
+    <!--begin::Card header-->
+    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-outline ki-magnifier fs-3 position-absolute ms-4"></i>
+                <input 
+                    type="text" 
+                    data-kt-ecommerce-product-filter="search" 
+                    class="form-control form-control-solid w-250px ps-12" 
+                    placeholder="Search Product" 
+                    id="productSearchInput"
+                    onkeyup="filterProducts()" />
+            </div>
+            <!--end::Search-->
+        </div>
+        <!--end::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <div class="w-100 mw-150px">
+                <!--begin::Select2-->
+                <select 
+                    class="form-select form-select-solid" 
+                    data-control="select2" 
+                    data-hide-search="true" 
+                    data-placeholder="Status" 
+                    data-kt-ecommerce-product-filter="status" 
+                    onchange="filterByStatus(this.value)">
+                    <option value="all">All</option>
+                    <option value="in-stock">In stock</option>
+                    <option value="out-of-stock">Out of stock</option>
+                </select>
+                <!--end::Select2-->
+            </div>
+        </div>
+        <!--end::Card toolbar-->
+    </div>
+    <!--end::Card header-->
+
+    <div class="card-body pt-0">
+        <div class="table-responsive">
+            <!-- In Stock Table -->
+            {% for product, items in grouped_by_product.items %}
+                <div class="product-section in-stock">
+                   <h3>{{ product.product_name }} 
+   
+</h3> {% if product.stock_quantity <= product.minimum_stock_quantity %}
+        <span class="text-warning">This product is running low!</span>
+    {% endif %}
+
+                    <table class="table table-bordered align-middle table-row-dashed fs-6">
+                        <thead>
+                            <tr>
+                                <th>Expiry Date</th>
+								<th>Quantity Remaining</th>
+                                <th>Category</th>
+                                
+                                <th>Unit Price</th>
+								<th>Purchase Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+								
+                                <tr data-expiry-date="{{ item.expiry_date }}">
+                                    <td >{{ item.expiry_date }}</td>
+									<td >
+    {{ item.quantity_remaining }}
+</td>
+
+                                    <td>{{ product.category }}</td>
+                                    
+                                    <td>${{ item.unit_price }}</td>
+									<td>{{ item.purchase_date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    
+                    </table>
+                </div>
+            {% endfor %}
+
+            <!-- Out of Stock Table -->
+            {% for product, items in grouped_by_product_over.items %}
+                <div class="product-section out-of-stock">
+                    <h3>{{ product.product_name }}</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Expiry Date</th>
+								<th>Quantity Remaining</th>
+                                <th>Category</th>
+                                
+                                <th>Unit Price</th>
+								<th>Last Purchase Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr data-expiry-date="{{ item.expiry_date }}">
+                                    <td >{{ item.expiry_date }}</td>
+									<td>{{ item.quantity_remaining }}</td>
+                                    <td>{{ product.category }}</td>
+                                    
+                                    <td>${{ item.unit_price }}</td>
+									<td>{{ item.purchase_date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    
+					</table>
+                </div>
+            {% endfor %}
+        </div>
+   
+   </div>
+
+
+</div>
+<!--end::Products-->
+
+
+
+</div>
+<!--end::Container-->	
+<script>
+function filterProducts() {
+    const searchInput = document.getElementById("productSearchInput").value.toLowerCase();
+    const productSections = document.querySelectorAll(".product-section");
+
+    productSections.forEach((section) => {
+        const productName = section.querySelector("h3").textContent.toLowerCase();
+        if (productName.includes(searchInput)) {
+            section.style.display = ""; // Show section if it matches the search
+        } else {
+            section.style.display = "none"; // Hide section if it doesn't match
+        }
+    });
+}
+
+function filterByStatus(status) {
+    const inStockSections = document.querySelectorAll(".product-section.in-stock");
+    const outOfStockSections = document.querySelectorAll(".product-section.out-of-stock");
+
+    if (status === "in-stock") {
+        // Show only In Stock sections
+        inStockSections.forEach((section) => section.style.display = "");
+        outOfStockSections.forEach((section) => section.style.display = "none");
+    } else if (status === "out-of-stock") {
+        // Show only Out of Stock sections
+        inStockSections.forEach((section) => section.style.display = "none");
+        outOfStockSections.forEach((section) => section.style.display = "");
+    } else {
+        // Show all sections
+        inStockSections.forEach((section) => section.style.display = "");
+        outOfStockSections.forEach((section) => section.style.display = "");
+    }
+}
+
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get today's date
+        const today = new Date();
+        
+        // Select all rows with a data-expiry-date attribute
+        const rows = document.querySelectorAll('tr[data-expiry-date]');
+        
+        rows.forEach(row => {
+            const expiryDateStr = row.getAttribute('data-expiry-date');
+            if (expiryDateStr) {
+                const expiryDate = new Date(expiryDateStr);
+                const timeDiff = expiryDate - today;
+                const dayDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+
+                // Add Bootstrap classes to the row based on the difference
+                if (dayDiff <= 10 && dayDiff >= 0) {
+                    row.classList.add('table-warning'); // Apply yellow background to the row
+                } else if (dayDiff < 0) {
+                    row.classList.add('table-danger'); // Apply red background to the row
+                }
+            }
+        });
+    });
+
+
+
+</script>
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 
+ 
+ 
+ 

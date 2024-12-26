@@ -1,0 +1,96 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <div class="row">
+  {% for product in products %}
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card product-card" style="border-radius: 8px; overflow: hidden;">
+            <img src="{{ product.product_image.url }}" alt="Product Image" style="border-radius: 5px;">
+			 
+            <div class="card-body p-1">
+                <a href="{% url 'product' product.pk %}"><h5 class="text-dark fs-9  text-decoration-underline">{{ product.product_name }}</h5></a>
+                <h5 class="text-danger fs-11">UGX {{ product.price }}</h5>
+                <div class="d-flex justify-content-center align-items-center">
+                    <button id="cart-button-{{ product.id }}" class="btn btn-warning shadow-sm mb-2 p-1 fs-11 rounded"
+                            onclick="addToCart({{ product.id }}, '{{ product.product_name }}', {{ product.price }}, '{{ product.product_image.url }}')">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+<script>
+
+function addToCart(id, name, price, image) {
+	alert()
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const product = cart.find(item => item.id === id);
+
+    if (product) {
+        product.quantity += 1;
+    } else {
+        cart.push({ id, name, price, quantity: 1, image });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    
+
+    // Change button color and text
+    const button = document.getElementById(`cart-button-${id}`);
+    if (button) {
+        console.log(`Updating button with id cart-button-${id}`); // Log button id
+        button.classList.remove('btn-warning');
+        button.classList.add('btn-success');
+        button.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
+    } else {
+        console.error(`Button with id cart-button-${id} not found`);
+    }
+}
+
+
+</script>
+
+
+    </div>
+</div>
+<!--end::Container-->
+{% endblock %}
+
+
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

@@ -1,0 +1,252 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+
+      <!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Card-->
+<!--begin::Basic info-->
+<div class="card mb-5 mb-xl-10">
+    <!--begin::Card header-->
+    <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+        <!--begin::Card title-->
+        <div class="card-title m-0">
+            <h3 class="fw-bold m-0">Create Product</h3>
+        </div>
+        <!--end::Card title-->
+    </div>
+    <!--begin::Card header-->
+
+    <!--begin::Content-->
+    <div id="kt_account_settings_profile_details" class="collapse show">
+        <!--begin::Form-->
+        <form method = "POST" enctype ="multipart/form-data" novalidate="novalidate"  action=""id="kt_account_profile_details_form" class="form">
+				{% csrf_token %}
+				{% for hidden_field in form.hidden_fields %}
+							{{ hidden_field }}
+	{% endfor %}
+	{% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+		
+            <!--begin::Card body-->
+            <div class="card-body border-top p-9">
+                <!--begin::Input group-->
+                <div class="row mb-6">
+                    <!--begin::Label-->
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">Product Image</label>   
+                    <!--end::Label-->  
+                    
+                    <!--begin::Col-->
+                    <div class="col-lg-8">
+                        <!--begin::Image input-->
+                        <div class="image-input image-input-outline" data-kt-image-input="true" style="background-image: url('{% static 'home/assets/media/svg/avatars/blank.svg' %}')">
+                            <!--begin::Preview existing avatar-->
+                            <div class="image-input-wrapper w-125px h-125px" {% if product.product_image %}style="background-image: url({{ product.product_image.url }})"{% endif %}></div>
+                            <!--end::Preview existing avatar-->
+
+                            <!--begin::Label-->
+                            <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
+                                <i class="fas fa-pencil fs-7"></i>
+                                <!--begin::Inputs-->
+                                <input type="file" id="id_product_image" name="product_image" accept=".png, .jpg, .jpeg"/>
+                                <input type="hidden" name="avatar_remove"/>
+                                <!--end::Inputs-->
+                            </label>
+                            <!--end::Label-->
+
+                            <!--begin::Cancel-->
+                            <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
+                                <i class="fas fa-times fs-2"></i>                            </span>
+                            <!--end::Cancel-->
+
+                            <!--begin::Remove-->
+                            <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
+                                <i class="fas fa-times fs-2"></i>                            </span>
+                            <!--end::Remove-->
+                        </div>
+                        <!--end::Image input-->
+
+                        <!--begin::Hint-->
+                        <div class="form-text">Allowed file types:  png, jpg, jpeg.</div>
+                        <!--end::Hint-->
+                    </div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Input group-->
+
+               
+
+                <!--begin::Input group-->
+                <div class="row mb-6">
+                    <!--begin::Label-->
+                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">Product Name</label>
+                    <!--end::Label-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-8 fv-row">
+                        <input type="text" value="{{ product.product_name }}"id="id_product_name" name="product_name" class="form-control form-control-lg form-control-solid" placeholder="Product name"  />
+                    <div class="text-danger mt-2">{% for error in form.product_name.errors %}
+                {{ error }}
+            {% endfor %}</div>
+					</div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Input group-->
+
+
+<!--begin::Input group-->
+                <div class="row mb-6">
+                    <!--begin::Label-->
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        <span class="required">Minimum Stock level</span>
+
+                        
+				<span class="ms-1"  data-bs-toggle="tooltip"  >
+					<i class="ki-outline ki-information-5 text-gray-500 fs-6"></i></span>                    </label>
+									<!--end::Label-->
+                    
+                    <!--begin::Col-->
+                    <div class="col-lg-8 fv-row">
+                        <input type="number" value="{{ product.minimum_stock_quantity }}" id="id_minimum_stock_quantity" name="minimum_stock_quantity" class="form-control form-control-lg form-control-solid" placeholder="Product Price"  />
+                    <div class="text-danger mt-2">{% for error in form.minimum_stock_quantity.errors %}
+                {{ error }}
+            {% endfor %}</div>
+					</div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Input group-->
+
+
+
+
+                <!--begin::Input group-->
+                <div class="row mb-6">
+                    <!--begin::Label-->
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        <span class="required">Price</span>
+
+                        
+				<span class="ms-1"  data-bs-toggle="tooltip"  >
+					<i class="ki-outline ki-information-5 text-gray-500 fs-6"></i></span>                    </label>
+									<!--end::Label-->
+                    
+                    <!--begin::Col-->
+                    <div class="col-lg-8 fv-row">
+                        <input type="number" value="{{ product.price }}"id="id_price" name="price" class="form-control form-control-lg form-control-solid" placeholder="Product Price"  />
+                    <div class="text-danger mt-2">{% for error in form.price.errors %}
+                {{ error }}
+            {% endfor %}</div>
+					</div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Input group-->
+				
+				<!--begin::Input group-->
+                <div class="row mb-6">
+                    <!--begin::Label-->
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        <span class="required">Categories</span>
+
+                        
+<span class="ms-1"  data-bs-toggle="tooltip" title="Country of origination" >
+	<i class="ki-outline ki-information-5 text-gray-500 fs-6"></i></span>                    </label>
+                    <!--end::Label-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-8 fv-row">
+                        <select  id="id_category" name="category" aria-label="Select a Country" data-control="select2" data-placeholder="Select a category..." class="form-select form-select-solid form-select-lg fw-semibold">
+                            <option value="">Select a Category...</option>
+							{% for category in categories %}
+								
+                                     <option  value="{{category.id}}"{% if category == product.category%} selected {% endif %}>{{category.name}}</option>
+								
+                            {% endfor %}                              
+                                                    </select>
+                    </div>
+                    <!--end::Col-->
+					<div class="text-danger mt-2">{% for error in form.category.errors %}
+                {{ error }}
+            {% endfor %}</div>
+                </div>
+                <!--end::Input group-->
+				
+				<!--begin::Input group-->
+        <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                <span class="required">Product Description</span>
+                
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+                <textarea id="id_description" name="description" class="form-control form-control-lg form-control-solid" rows="4" placeholder="Product description">{{product.description}}</textarea>
+                <div class="text-danger mt-2">
+                    {% for error in form.description.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+            <!--end::Col-->
+        </div>
+        <!--end::Input group-->
+
+                
+            </div>
+            <!--end::Card body-->
+
+            <!--begin::Actions-->
+            <div class="card-footer d-flex justify-content-end py-6 px-9">
+                <button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>
+                <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>
+            </div>
+            <!--end::Actions-->
+        </form>
+        <!--end::Form-->
+    </div>
+    <!--end::Content-->
+</div>
+<!--end::Basic info-->
+
+<!--end::Card--></div>
+<!--end::Container--> 
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

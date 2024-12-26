@@ -1,0 +1,154 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <div class="row">
+	<div class="card py-5">
+    <!--begin::Section-->
+<div class="mb-17">
+	
+    <!--begin::Content-->
+    <div class="d-flex flex-stack mb-5">
+        <!--begin::Title-->
+        <h3 class="text-gray-900">Hottest Bundles</h3>
+        <!--end::Title-->
+
+        <!--begin::Link-->
+        <a href="#" class="fs-6 fw-semibold link-primary">
+            View All Offers
+        </a>   
+        <!--end::Link-->
+    </div>  
+    <!--end::Content-->          
+
+    <!--begin::Separator-->
+    <div class="separator separator-dashed mb-9"></div>
+    <!--end::Separator-->
+
+    <!--begin::Row-->
+    <div class="row g-10">   
+	{% for escort in escorts %}
+        <!--begin::Col--> 
+        <div class="col-md-4">           
+            <!--begin::Hot sales post-->
+<div class="card-xl-stretch me-md-6">  
+    <!--begin::Overlay-->
+    <a class="d-block overlay" data-fslightbox="lightbox-hot-sales" href="{% if escort.image1 %} {{ escort.image1.url }}{% endif %}">       
+        <!--begin::Image-->
+        <div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-175px"
+            style="background-image:url('{% if escort.image1 %} {{ escort.image1.url }}{% endif %}')">                       
+        </div>
+        <!--end::Image-->
+
+        <!--begin::Action-->
+        <div class="overlay-layer card-rounded bg-dark bg-opacity-25">
+            <i class="ki-outline ki-eye fs-2x text-white"></i>        </div>  
+        <!--end::Action-->      
+    </a>  
+    <!--end::Overlay-->  
+
+    <!--begin::Body-->
+    <div class="mt-5">    
+        <!--begin::Title-->
+        <a href="#" data-id="{{ escort.pk }}" class="fs-4 text-gray-900 fw-bold text-hover-primary text-gray-900 lh-base" onclick="storeEscortId({{ escort.pk }})">
+    {{ escort.name }}
+</a>
+      
+        <!--end::Title-->
+
+        <!--begin::Text-->
+        <div class="fw-semibold fs-5 text-gray-600 text-gray-900 mt-3">    
+            {{escort.bio}}   </div>
+        <!--end::Text-->
+
+        <!--begin::Text-->
+        <div class="fs-6 fw-bold mt-5 d-flex flex-stack">
+            <!--begin::Label-->
+            <span class="badge border border-dashed fs-2 fw-bold text-gray-900 p-2">
+                <span class="fs-6 fw-semibold text-gray-500">Start Price $</span>
+
+                5000          </span>
+            <!--end::Label-->            
+            
+            <!--begin::Action-->
+            <a href="#" class="btn btn-sm btn-primary">Request Escort</a>     
+            <!--end::Action-->              
+        </div>
+        <!--end::Text-->      
+    </div>
+    <!--end::Body-->                      
+</div>
+<!--end::Hot sales post-->
+
+ 
+
+         </div>  
+        <!--end::Col-->  
+	{% endfor %}
+             
+    </div>
+    <!--end::Row-->
+	</div>
+</div>
+<!--end::Section-->
+
+    </div>
+</div>
+<!--end::Container-->
+<script>
+function storeEscortId(escortId) {
+    $.ajax({
+        url: '{% url "store_escort_id" %}', // Make sure this URL matches the URL pattern for your view
+        type: 'POST',
+        data: {
+            'escort_id': escortId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Redirect to the page after successfully setting the session
+            window.location.href = '{% url "ourescort" %}'; // Replace with the actual URL to fetch the escort
+        },
+        error: function(xhr, status, error) {
+            console.error("Error: ", error);
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

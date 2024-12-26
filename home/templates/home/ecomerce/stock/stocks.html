@@ -1,0 +1,195 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+					<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    
+<!--begin::Row-->
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9">
+		 <!--begin::Add new card-->
+    <div class="ol-md-4">
+        <!--begin::Card-->
+        <div class="card h-md-100">
+            <!--begin::Card body-->
+            <div class="card-body d-flex flex-center">
+                <!--begin::Button-->
+                <button type="button" class="btn btn-clear d-flex flex-column flex-center" data-bs-toggle="modal" data-bs-target="#kt_modal_add_role">
+                    <!--begin::Illustration-->
+                    <img src="../../../assets/media/illustrations/unitedpalms-1/4.png" alt="" class="mw-100 mh-150px mb-7"/>                      
+                    <!--end::Illustration-->
+
+                    <!--begin::Label-->
+                    <a href="{% url 'create_purchase'  %}"  class="text-gray-600 text-hover-primary">Add New Purchase</a>
+                    <!--end::Label-->
+                </button>
+                <!--begin::Button-->
+            </div>
+            <!--begin::Card body-->
+        </div>
+        <!--begin::Card-->
+    </div>
+    <!--begin::Add new card-->
+		
+		
+		
+		{% for purchase in purchases %}
+            <!--begin::Col-->
+        <div class="col-md-4">
+            <!--begin::Card-->
+            <div class="card card-flush h-md-100">
+                <!--begin::Card header-->
+                <div class="card-header">
+                    <!--begin::Card title-->
+                    <div class="card-title">
+                        <h5>{{ purchase.purchase_number }} by {{purchase.purchased_by.user_name}} </h5>
+                    </div>
+                    <!--end::Card title-->
+                </div>
+                <!--end::Card header-->
+
+                <!--begin::Card body-->
+                <div class="card-body pt-1">
+                    
+<!--begin::Wrapper-->
+                    <div class="d-flex flex-column flex-grow-1 pe-8">
+                        <!--begin::Stats-->
+                        <div class="d-flex flex-wrap">
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-1 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-outline ki-arrow-up fs-3 text-success me-2"></i> 
+									<div class="fs-6 fw-bold" data-kt-countup="true" data-kt-countup-value="{{ purchase.total_purchase_price|subtract:purchase.total_operation_costs }}" data-kt-countup-prefix="UGX">0</div>
+                                </div>
+                                <!--end::Number-->
+
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">Purchase Cost</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-1 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-outline ki-arrow-down fs-3 text-danger me-2"></i>
+									<div class="fs-6 fw-bold" data-kt-countup="true" data-kt-countup-value="{{purchase.total_operation_costs}}" data-kt-countup-prefix="UGX">0</div>
+                                </div>
+                                <!--end::Number-->
+
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">Operation Costs</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-1 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-outline ki-arrow-up fs-3 text-success me-2"></i>
+									<div class="fs-6 fw-bold" data-kt-countup="true" data-kt-countup-value="{{purchase.total_purchase_price}}" data-kt-countup-prefix="UGX">0</div>
+                                </div>
+                                <!--end::Number-->                                
+
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">Total Purchase Cost</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+                        </div>
+                        <!--end::Stats-->
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Card body-->
+
+                <!--begin::Card footer-->
+                <div class="card-footer flex-wrap pt-0">
+                    <a href="{% url 'purchase_detail' purchase.purchase_number %}"  class="btn btn-light btn-primary my-1 me-2">View </a>
+
+                    <button type="button" class="btn btn-light btn-warning my-1" ><a class="text-white"href="">Lock </a>
+					</button>
+                </div>
+                <!--end::Card footer-->
+            </div>
+            <!--end::Card-->
+        </div>
+        <!--end::Col-->
+         {% endfor %}   
+   
+</div>
+<!--end::Row-->
+
+<!--begin::Modals-->
+
+<!--begin::Modal - Add role-->
+<div class="modal fade" id="kt_modal_add_role" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-750px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2 class="fw-bold">Add a Role</h2>
+                <!--end::Modal title-->
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-roles-modal-action="close">
+                    <i class="ki-outline ki-cross fs-1"></i>                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+
+            <!--begin::Modal body-->
+            <div class="modal-body scroll-y mx-lg-5 my-7">
+                
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Add role-->
+<!--begin::Modal - Update role-->
+
+<!--end::Modal - Update role--><!--end::Modals--></div>
+<!--end::Container-->  
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

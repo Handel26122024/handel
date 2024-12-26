@@ -1,0 +1,186 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+		<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Products-->
+<div class="card card-flush">
+    <!--begin::Card header-->
+    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-outline ki-magnifier fs-3 position-absolute ms-4"></i>                <input type="text" data-kt-ecommerce-product-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Search Product" />
+            </div>
+            <!--end::Search-->
+        </div>
+        <!--end::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <div class="w-100 mw-150px">
+                <!--begin::Select2-->
+                <select class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-placeholder="Status" data-kt-ecommerce-product-filter="status">
+                    <option></option>
+                    <option value="all">All</option>
+                    <option value="published">Published</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <!--end::Select2-->
+            </div>
+
+            <!--begin::Add product-->
+            <a href="{% url 'addproduct'  %}" class="btn btn-primary">
+                Add Product
+            </a>
+            <!--end::Add product-->
+        </div>
+        <!--end::Card toolbar-->
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+<div class="card-body pt-0">
+    <!--begin::Responsive Table Wrapper-->
+    <div class="table-responsive">
+        <!--begin::Table-->
+        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_products_table">
+            <thead>
+                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                    <th class="min-w-200px">Product</th>
+					<th class="text-end min-w-100px">Min. Stock Level</th>
+                    <th class="text-end min-w-100px">Price</th>
+                    <th class="text-end min-w-100px">Category</th>
+                    <th class="text-end min-w-70px">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="fw-semibold text-gray-600">
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <!--begin::Thumbnail-->
+                            <a href="{% url 'product' product.pk %}" class="symbol symbol-50px">
+                                <span class="symbol-label" style="background-image:url({% if product.product_image %} {{ product.product_image.url }}{% endif %});"></span>
+                            </a>
+                            <!--end::Thumbnail-->
+                            <div class="ms-5">
+                                <!--begin::Title-->
+                                <a href="{% url 'product' product.pk %}" class="text-gray-800 text-hover-primary fs-5 fw-bold" data-kt-ecommerce-product-filter="product_name">{{ product.product_name }}</a>
+                                <!--end::Title-->
+                            </div>
+                        </div>
+                    </td>
+					<td class="text-end pe-0">
+                        <span class="fw-bold">{{ product.minimum_stock_quantity }}</span>
+                    </td>
+                    <td class="text-end pe-0">
+                        <span class="fw-bold">{{ product.price }}</span>
+                    </td>
+                    <td class="text-end pe-0" data-order="{{ product.category }}">
+                        <span class="fw-bold ms-3">{{ product.category }}</span>
+                    </td>
+                    <td class="text-end">
+                        <a href="#" class="btn btn-sm btn-light btn-flex btn-center btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                            Actions
+                            <i class="fa fa-arrow-down fs-5 ms-1"></i>
+                        </a>
+                        <!--begin::Menu-->
+                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4" data-kt-menu="true">
+                            <!--begin::Menu item-->
+                            <div class="menu-item px-3">
+                                <a href="{% url 'editproduct' product.pk %}" class="menu-link px-3">
+                                    Edit
+                                </a>
+                            </div>
+                            <!--end::Menu item-->
+                            <!--begin::Menu item-->
+                            <div class="menu-item px-3">
+                                <a href="{% url 'deleteproduct' product.pk %}" class="menu-link px-3" data-kt-ecommerce-product-filter="delete_row">
+                                    Delete
+                                </a>
+                            </div>
+                            <!--end::Menu item-->
+                        </div>
+                        <!--end::Menu-->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!--end::Table-->
+    </div>
+    <!--end::Responsive Table Wrapper-->
+</div>
+<!--end::Card body-->
+
+</div>
+
+<!--end::Products--></div>
+<!--end::Container-->	
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Get references to the search input and the table body
+    const searchInput = document.querySelector('[data-kt-ecommerce-product-filter="search"]');
+    const productRows = document.querySelectorAll('#kt_ecommerce_products_table tbody tr');
+
+    // Function to filter products based on the search input
+    const filterProducts = () => {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        // Loop through each row and toggle visibility based on the search term
+        productRows.forEach(row => {
+            const productName = row.querySelector('[data-kt-ecommerce-product-filter="product_name"]');
+            if (productName) {
+                const nameText = productName.textContent.toLowerCase();
+                if (nameText.includes(searchTerm)) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            }
+        });
+    };
+
+    // Add event listener for the search input
+    searchInput.addEventListener('input', filterProducts);
+});
+
+
+</script>
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

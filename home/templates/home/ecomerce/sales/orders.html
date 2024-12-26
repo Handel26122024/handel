@@ -1,0 +1,320 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content%}
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Flatpickr CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+		<!--begin::Container-->
+<div id="kt_content_container" class=" container-xxl ">
+    <!--begin::Products-->
+<div class="card card-flush">
+    <!--begin::Card header-->
+    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+        <!--begin::Card title-->
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-outline ki-magnifier fs-3 position-absolute ms-4"></i>                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Search Order" />
+            </div>
+            <!--end::Search-->
+        </div>
+        <!--end::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+            <!--begin::Flatpickr-->
+            <div class="input-group w-250px">
+                <input class="form-control form-control-solid rounded rounded-end-0" placeholder="Pick date range" id="kt_ecommerce_sales_flatpickr" />
+                <button class="btn btn-icon btn-light" id="kt_ecommerce_sales_flatpickr_clear">
+                    <i class="ki-outline ki-cross fs-2"></i>                </button>
+            </div>
+            <!--end::Flatpickr-->
+
+            <div class="w-100 mw-150px">
+                <!--begin::Select2-->
+                <select class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-placeholder="Status" data-kt-ecommerce-order-filter="status">
+                    <option></option>
+                    <option value="all">Status</option>
+					<option value="Pending">Pending</option>
+					{% for stat in status %}
+                    <option value="{{stat.status_name}}">{{stat.status_name}}</option>
+                    {% endfor %}
+                </select>
+                <!--end::Select2-->
+            </div>
+
+            <!--begin::Add product-->
+            <a href="{% url 'shop'  %}"  class="btn btn-primary">
+                Add Order
+            </a>
+            <!--end::Add product-->
+        </div>
+        <!--end::Card toolbar-->
+    </div>
+    <!--end::Card header-->
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        
+<!--begin::Table-->
+<div class="table-responsive">
+    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_sales_table">
+        <thead>
+            <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                <th class="min-w-100px">Location</th>
+                <th class="text-end min-w-70px"><div class="w-100 mw-150px">
+    Status
+</div></th>
+                <th class="text-end min-w-100px">Total</th>
+				<th class="text-end min-w-100px">Balance</th>
+				<th class="text-end min-w-100px">Date Added</th>
+				<th class="text-end min-w-100px">
+                    
+                    <select class="form-select form-select-sm" id="counterFilter">
+                        <option value="">Counter</option>
+                        <!-- Add counter options dynamically -->
+						<option value="Pending"> Pending</option>
+                        {% for counter in staffs %}
+                            <option value="{{ counter.assigned_staff.user_name }}"> {{ counter.assigned_staff.user_name }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+				<th class="text-end min-w-100px">
+                    
+                    <select class="form-select form-select-sm" id="delivererFilter">
+                        <option value="">Deliverer</option>
+                        <!-- Add deliverer options dynamically 
+						-->
+							<option value="Pending"> Pending</option>
+                        {% for deliverer in staffs %}
+                            <option value="{{ deliverer.assigned_staff.user_name }}">{{ deliverer.assigned_staff.user_name }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                				<th class="text-end min-w-100px">Date </th>
+								
+								
+                <th class="text-end min-w-100px">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="fw-semibold text-gray-600">
+            {% for order in orders %}
+            <tr>
+                <td class="text-start">{{ order.order_location }}</td>
+                <td class="text-end pe-0">
+				{% if order.status %}
+    <div class="badge badge-light-primary">{{ order.status }}</div>
+	
+	
+	{% else %}
+	<div class="badge badge-light-warning">Pending</div>
+	{% endif %}
+</td>
+                <td class="text-end pe-0">
+                    <span class="fw-bold">UGX{{ order.total_price }}</span>
+                </td>
+				 <td class="text-end pe-0">
+                    <span class="fw-bold">UGX{{ order.balance }}</span>
+                </td>
+				<td class="text-end">{{ order.created_at|timesince }}</td>
+				<td class="text-end pe-0">
+					{% if order.counter_by.assigned_staff.user_name %}
+					
+                    <span class="fw-bold text-info">{{ order.counter_by.assigned_staff.user_name }}</span>
+					{% else %}
+					<span class="fw-bold text-warning">Pending</span>
+					{% endif %}
+					
+                </td>
+				<td class="text-end pe-0">
+				{% if order.delivered_by.assigned_staff.user_name %}
+                    <span class="fw-bold text-info">{{ order.delivered_by.assigned_staff.user_name }}</span>
+					{% else %}
+					<span class="fw-bold text-warning">Pending</span>
+					{% endif %}
+                </td>
+                <td>{{ order.created_at|date:"Y-m-d" }}</td>
+                <!-- Actions Column -->
+<td class="text-end">
+    <!--begin::Dropdown-->
+    <div class="dropdown">
+        <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-bs-toggle="dropdown" aria-expanded="false">
+            Actions
+        </a>
+        <div class="dropdown-menu dropdown-menu-end">
+            <div class="menu-item px-3">
+                <a href="{% url 'order' order.pk %}" class="dropdown-item">
+                    View
+                </a>
+            </div>
+            <div class="menu-item px-3">
+                <a href="{% url 'editorder' order.pk %}" class="dropdown-item">
+                    Edit
+                </a>
+            </div>
+            <div class="menu-item px-3">
+                <a href="#" class="dropdown-item" data-kt-ecommerce-order-filter="delete_row">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+    <!--end::Dropdown-->
+</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" class="text-end">Total:</td>
+                <td class="text-end fw-bold" id="totalSum">UGX0</td>
+                <td class="text-end fw-bold text-danger" id="balanceSum">UGX0</td>
+                <td colspan="4"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<!--end::Table-->
+
+   </div>
+    <!--end::Card body-->
+</div>
+<!--end::Products--></div>
+<!--end::Container--> 
+
+<script>
+$(document).ready(function() {
+     // Initialize the date picker
+    var flatpickrInstance = $('#kt_ecommerce_sales_flatpickr').flatpickr({
+        mode: "range",
+        dateFormat: "Y-m-d",
+        onChange: function() {
+            filterTable();
+        }
+    });
+
+    // Search input
+    $('input[data-kt-ecommerce-order-filter="search"]').on('keyup', function() {
+        filterTable(); // Filter table on keyup in search box
+    });
+
+    // Status filter
+    $('select[data-kt-ecommerce-order-filter="status"]').on('change', function() {
+        filterTable(); // Filter table when status changes
+    });
+
+    // Counter filter
+    $('#counterFilter').on('change', function() {
+        filterTable(); // Filter table when counter changes
+    });
+
+    // Deliverer filter
+    $('#delivererFilter').on('change', function() {
+        filterTable(); // Filter table when deliverer changes
+    });
+
+    // Function to filter the table
+    function filterTable() {
+        var searchValue = $('input[data-kt-ecommerce-order-filter="search"]').val().toLowerCase();
+        var statusValue = $('select[data-kt-ecommerce-order-filter="status"]').val().toLowerCase();
+        var counterValue = $('#counterFilter').val().toLowerCase();
+        var delivererValue = $('#delivererFilter').val().toLowerCase();
+        var dateRange = flatpickrInstance.selectedDates || []; // Get the selected dates
+        var totalSum = 0;
+        var balanceSum = 0;
+
+        $('#kt_ecommerce_sales_table tbody tr').each(function() {
+            var location = $(this).find('td').eq(0).text().toLowerCase();
+            var status = $(this).find('td').eq(1).text().trim().toLowerCase();
+            var total = parseFloat($(this).find('td:nth-child(3) span').text().replace('UGX', '').replace(/,/g, ''));
+            var balance = parseFloat($(this).find('td:nth-child(4) span').text().replace('UGX', '').replace(/,/g, ''));
+            var counter = $(this).find('td:nth-child(6) span').text().trim().toLowerCase();
+            var deliverer = $(this).find('td:nth-child(7) span').text().trim().toLowerCase();
+            var dateAddedText = $(this).find('td').eq(7).text().trim(); // Column with the date
+            var dateMatch = true;
+
+            // Parse dateAddedText into a Date object
+            var dateAdded = new Date(dateAddedText);
+
+            // Search filter
+            if (searchValue && !location.includes(searchValue)) {
+                $(this).hide();
+                return;
+            }
+
+            // Status filter
+            if (statusValue && statusValue !== 'all' && status !== statusValue) {
+                $(this).hide();
+                return;
+            }
+
+            // Counter filter
+            if (counterValue && !counter.includes(counterValue)) {
+                $(this).hide();
+                return;
+            }
+
+            // Deliverer filter
+            if (delivererValue && !deliverer.includes(delivererValue)) {
+                $(this).hide();
+                return;
+            }
+
+            // Date range filter
+            if (dateRange.length > 0) {
+                var startDate = new Date(dateRange[0]);
+				var endDate = dateRange.length > 1 ? new Date(dateRange[1]) : startDate;
+
+                if (dateAdded < startDate || dateAdded > endDate) {
+                    dateMatch = false;
+                }
+            }
+
+            // Show/Hide rows based on all filters
+            if (dateMatch) {
+                $(this).show();
+                totalSum += total;
+                balanceSum += balance;
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Update the totals in the footer
+        $('#totalSum').text('UGX' + totalSum.toLocaleString());
+        $('#balanceSum').text('UGX' + balanceSum.toLocaleString());
+    }
+
+    // Initial table filter on page load
+    filterTable();
+});
+
+
+</script>
+
+{% endblock %}
+{% block Javascript%}
+	 
+        
+                   
+        
+                    
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 

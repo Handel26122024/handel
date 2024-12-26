@@ -1,0 +1,397 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css%}
+					
+					<!--begin::Vendor Stylesheets(used for this page only)-->
+                            <link href="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css"/>
+                        <!--end::Vendor Stylesheets-->
+	
+				{% endblock%}
+{% block content %}
+<!--begin::Container-->
+<div id="kt_content_container" class="container-xxl">
+    <div class="row">
+        <!--begin::Pos order-->
+        <div class="card card-flush bg-body" id="kt_pos_form">
+            <!--begin::Header-->
+            <div class="card-header pt-5">
+                <p class="card-title fw-bold text-gray-800 fs-2qx">Cart</p>
+				<div id="notifications">
+    <span id="notification-counter">{{ unread_notifications_count }}</span>
+<ul id="notifications-list">
+    {% for notification in notifications %}
+        <li id="notification-{{ notification.id }}" class="notification-item {% if not notification.viewed %}font-bold{% else %}font-light{% endif %}">
+            {{ notification.message }}
+        </li>
+    {% endfor %}
+</ul>
+
+</div>
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+					<a href="{% url 'shop'  %}" class="btn btn-light-warning fs-4 fw-bold py-4 mx-2" onclick="clearCart()">Add Items</a>
+                    <a href="#" class="btn btn-light-danger fs-4 fw-bold py-4 mx-2" onclick="clearCart()">Clear All</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="card-body pt-0">
+                <!--begin::Table container-->
+                <div class="table-responsive mb-8">
+                    <!--begin::Table-->
+                    <table class="table align-middle gs-0 gy-4 my-0">
+                        <!--begin::Table head-->
+                        <thead>
+                            <tr>
+                                <th class="min-w-175px">Product</th>
+                                <th class="w-125px">Quantity</th>
+                                <th class="w-60px">Total</th>
+                            </tr>
+                        </thead>
+                        <!--end::Table head-->
+
+                        <!--begin::Table body-->
+                        <tbody id="cart-items">
+                            <!-- Cart items will be inserted here by JavaScript -->
+                        </tbody>
+                        <!--end::Table body-->
+                    </table>
+                    <!--end::Table-->
+					<div id="order-message" class="fs-11 mt-2"></div>
+                </div>
+                <!--end::Table container-->
+				
+		
+				
+				
+			<!-- First Dropdown -->
+<div class="fv-row">
+    <label class="required form-label">Location Around {{active_business.businesses.name}}</label>
+    <select id="location_around_dropdown" class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" 
+            name="shipping_method" >
+        <option></option>
+        <option value="not_around">Not Around {{active_business.businesses.name }}</option>
+        {% for location in locations %}
+			{% if location.location_type == 'Around Business' %}
+        <option value="{{ location.id }}">{{ location.name }}</option>	
+			{% endif %}
+        {% endfor %}
+    </select>
+    <div class="text-muted fs-7">Set table, room name or number where you are.</div>
+</div>
+
+<!-- Second Dropdown (Initially Hidden) -->
+<div class="fv-row" id="location_not_around_section" style="display: none;">
+    <label class="required form-label">Location Not Around {{active_business.businesses.name }}</label>
+    <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" 
+        name="shipping_method_not_around" id="location_not_around_dropdown">
+    <option></option>
+    {% for location in locations %}
+    {% if location.location_type == 'Not Around Business' %}
+    <option value="{{ location.id }}" data-price="{{ location.price }}">
+        {{ location.name }} ({{ active_business.businesses.currency }}: {{ location.price }})
+    </option>
+    {% endif %}
+    {% endfor %}
+</select>
+
+    <div class="text-muted fs-7">Set table, room name or number where you are.</div>
+</div>
+
+                <!--begin::Summary-->
+                <div class="d-flex flex-stack bg-success rounded-3 p-6 mb-11">
+                    <!--begin::Content-->
+                    <div class="fs-6 fw-bold text-white">
+                        <span class="d-block lh-1 mb-2">Subtotal</span>
+						<span class="d-block mb-2">Shipping Fee</span>
+                        <span class="d-block mb-2">Discounts</span>
+                        <span class="d-block mb-9">Tax(0%)</span>
+                        <span class="d-block fs-2qx lh-1">Total</span>
+                    </div>
+                    <!--end::Content-->
+
+                    <!--begin::Content-->
+                    <div class="fs-6 fw-bold text-white text-end">
+                        <span class="d-block lh-1 mb-2" id="subtotal">UGX0.00</span>
+						<span class="d-block mb-2" id="shippingcost">-UGX0.00</span>
+                        <span class="d-block mb-2" id="discount">-UGX0.00</span>
+                        <span class="d-block mb-9" id="tax">UGX0.00</span>
+                        <span class="d-block fs-2qx lh-1" id="grand-total">UGX0.00</span>
+                    </div>
+                    <!--end::Content-->
+                </div>
+                <!--end::Summary-->
+
+                <!--begin::Payment Method-->
+                <div class="m-0">
+                    <div class="card card-flush py-4">
+    
+
+    <!--begin::Card body-->
+    <div class="card-body pt-0">
+        <div class="d-flex flex-column gap-10">
+            
+
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Payment Method</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="payment_method" id="kt_ecommerce_edit_order_payment">
+                    <option></option>
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="visa" >Credit Card (Visa)</option>
+                    <option value="mastercard">Credit Card (Mastercard)</option>
+                    <option value="paypal">Paypal</option>
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set the date of the order to process.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+			<!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Amount </label>
+                <!--end::Label-->
+
+               <input type="text" id="cart_amount_paid" name="amount_paid" class="border-primary form-control form-control-lg form-control-solid" placeholder="Amount Paid" />
+                    <div class="text-danger mt-2">
+                        {% for error in form.amount_paid.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set the date of the order to process.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class="required form-label">Location</label>
+                <!--end::Label-->
+
+                <!--begin::Select2-->
+                <select class="form-select mb-2" data-control="select2" data-hide-search="true" data-placeholder="Select an option" name="shipping_method"  id="kt_ecommerce_edit_order_shipping">
+                    <option></option>
+					{% for location in locations %}
+                    <option value="{{location.id}}">{{location.name}}</option>
+                    {% endfor %}
+                </select>
+                <!--end::Select2-->
+
+                <!--begin::Description-->
+                <div class="text-muted fs-7">Set table , room name or number where you are.</div>
+                <!--end::Description-->
+            </div>
+            <!--end::Input group-->
+			<!--begin::Input group-->
+            <div class="fv-row">
+                <!--begin::Label-->
+                <label class=" form-label">Add order Note</label>
+                <!--end::Label-->
+
+                <textarea id="cart_order_note" name="order_note" class=" border-primary form-control form-control-lg form-control-solid" rows="2" placeholder="Order note"></textarea>
+                    <div class="text-danger mt-2">
+                        {% for error in form.order_note.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+
+                
+            </div>
+            <!--end::Input group-->
+            
+            
+        </div>
+    </div>
+    <!--end::Card header-->
+</div>
+
+                    <!--begin::Actions-->
+                    <button class="btn btn-primary fs-1 w-100 py-3" onclick="checkoutFx()">Check Out</button>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Payment Method-->
+            </div>
+            <!--end: Card Body-->
+        </div>
+        <!--end::Pos order-->
+    </div>
+</div>
+<!--end::Container-->
+<script>
+
+function checkoutFx() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+
+    const locationFieldAround = document.getElementById('location_around_dropdown');
+    const locationFieldNotAround = document.getElementById('location_not_around_dropdown');
+    const paymentMethodField = document.getElementById('kt_ecommerce_edit_order_payment');
+    const amountpaid = document.getElementById('cart_amount_paid');
+    const ordernote = document.getElementById('cart_order_note');
+    const shippingcost = document.getElementById('shippingcost');
+
+    const locationAround = locationFieldAround.value;
+	alert(locationAround)
+    const locationNotAround = locationFieldNotAround.value;
+	alert(locationNotAround)
+    // Check if the user selected a location (either around or not around)
+    let location = "";
+    let shipping = 0;
+
+    // Determine which location was selected
+    // Determine which location was selected
+	if (locationAround && locationAround !== 'not_around') {
+		// Use locationAround if it's not 'not_around'
+		location = locationAround;
+		shipping = 0;  // No additional shipping cost for "Around the business"
+	} else if (locationNotAround) {
+		// If locationAround is 'not_around', use locationNotAround
+		location = locationNotAround;
+		const selectedOption = locationFieldNotAround.options[locationFieldNotAround.selectedIndex];
+		shipping = selectedOption.dataset.price ? parseFloat(selectedOption.dataset.price) : 0; // Get shipping price
+	} else {
+		// Handle case where no location is selected
+		alert("Please select a valid location.");
+	}
+
+
+    const payment_method = paymentMethodField.value;
+    const amount_paid = amountpaid.value;
+    const order_note = ordernote.value;
+	const total_price = shipping + cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // Clear previous error messages
+    clearErrorMessages();
+
+    let hasError = false;
+
+    // Validation for required fields
+    if (!location) {
+        displayError(locationFieldAround, 'Please select a location.');
+        displayError(locationFieldNotAround, 'Please select a location.');
+        hasError = true;
+    }
+    if (!payment_method) {
+        displayError(paymentMethodField, 'Please select a payment method.');
+        hasError = true;
+    }
+    if (!amount_paid) {
+        displayError(amountpaid, 'Please add the amount you have at hand.');
+        hasError = true;
+    }
+    if (cart.length === 0) {
+        displayError(document.getElementById('cart-items'), 'Your cart is empty.');
+        hasError = true;
+    }
+
+    if (hasError) {
+        return;
+    }
+
+    // Log data to verify request payload
+    console.log('Sending checkout data:', { cart, total_price, location, payment_method, amount_paid, order_note, shipping });
+
+    // Send the checkout request
+    fetch("{% url 'checkout' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ cart, total_price, shipping, location, payment_method, amount_paid, order_note })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const messageContainer = document.getElementById('order-message');
+        const cartBody = document.querySelector('.card-body');
+
+        if (data.success) {
+            // Clear the cart from local storage and update UI
+            localStorage.removeItem('cart');
+            displayCartItems();
+            updateCartCount();
+
+            if (cartBody) {
+                // Replace cart content with a success message
+                cartBody.innerHTML = `
+                    <div class="alert alert-success text-center fs-11">
+                        Order placed successfully! Thank you for shopping with us.
+                    </div>
+                `;
+            } else {
+                console.error('Cart body container not found.');
+            }
+        } else {
+            // Display specific error message returned from the server with new classes
+            if (messageContainer) {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-danger text-center fs-11">
+                        ${data.error || 'Failed to place order.'}
+                    </div>
+                `;
+            } else {
+                alert(data.error || 'Failed to place order.');
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Checkout error:", error);
+        const messageContainer = document.getElementById('order-message');
+        if (messageContainer) {
+            messageContainer.innerHTML = `
+                <div class="alert alert-danger text-center fs-11">
+                    Failed to place order. Please try again.
+                </div>
+            `;
+        } else {
+            alert('Failed to place order. Please try again.');
+        }
+    });
+}
+
+</script>
+{% endblock %}
+
+{% block Javascript%}
+	 <script>
+
+</script>
+     
+        
+                    <!--begin::Vendors Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+                      
+                            <script src="{% static 'home/assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+                        <!--end::Vendors Javascript-->
+        
+                    <!--begin::Custom Javascript(used for this page only)-->
+                            <script src="{% static 'home/assets/js/widgets.bundle.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/widgets.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/apps/chat/chat.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/create-app.js' %}"></script>
+                            <script src="{% static 'home/assets/js/custom/utilities/modals/users-search.js' %}"></script>
+                        <!--end::Custom Javascript-->
+                <!--end::Javascript-->
+                    			
+				
+{% endblock%}
+ 
