@@ -101,10 +101,15 @@ WSGI_APPLICATION = 'handel.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'handeldb',  # The database you just created
+        'USER': 'postgres',  # PostgreSQL username
+        'PASSWORD': 'Vereine256',  # PostgreSQL password
+        'HOST': 'database-1.c1b1wxczaclk.us-east-1.rds.amazonaws.com',  # Your RDS endpoint
+        'PORT': '5432',  # PostgreSQL default port
     }
 }
+
 AUTH_USER_MODEL = 'home.UserAuth'
 
 # Password validation

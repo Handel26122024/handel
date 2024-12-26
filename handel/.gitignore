@@ -2,7 +2,7 @@
 venv/
 env/
 
-# Ignore Django migrations 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
+#
 */migrations/*.py[cod]
 
 # Ignore database files
